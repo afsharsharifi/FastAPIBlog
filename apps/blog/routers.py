@@ -5,7 +5,7 @@ from .models import Blog
 router = APIRouter()
 
 
-my_posts = [
+my_blogs = [
     {
         "id": 1,
         "title": "This is 1 title",
@@ -29,15 +29,27 @@ my_posts = [
 ]
 
 
-@router.get("/blog")
+def find_blog_by_id(id: int):
+    for blog in my_blogs:
+        if blog["id"] == id:
+            return blog
+
+
+@router.get("/blogs")
 def get_blogs():
-    return {"data": my_posts}
+    return {"data": my_blogs}
 
 
-@router.post("/blog")
-def create_blogs(blog: Blog):
-    new_id = my_posts[-1]["id"] + 1
+@router.post("/blogs")
+def create_blog(blog: Blog):
+    new_id = my_blogs[-1]["id"] + 1
     post_dict = blog.model_dump()
     post_dict["id"] = new_id
-    my_posts.append(post_dict)
+    my_blogs.append(post_dict)
     return {"data": post_dict}
+
+
+@router.get("/blogs/{id}")
+def get_blog(id: int):
+    blog = find_blog_by_id(id)
+    return {"data": blog}
