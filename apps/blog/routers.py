@@ -1,35 +1,12 @@
-import psycopg2
 import time
+
+import psycopg2
 from fastapi import APIRouter, HTTPException, Response, status
 from psycopg2.extras import RealDictCursor
 
 from .models import Blog
 
 router = APIRouter()
-
-
-my_blogs = [
-    {
-        "id": 1,
-        "title": "This is 1 title",
-        "content": "Here",
-    },
-    {
-        "id": 2,
-        "title": "This is 2 title",
-        "content": "Here",
-    },
-    {
-        "id": 3,
-        "title": "This is 3 title",
-        "content": "Here",
-    },
-    {
-        "id": 4,
-        "title": "This is 4 title",
-        "content": "Here",
-    },
-]
 
 while True:
     try:
@@ -41,18 +18,6 @@ while True:
         print("Database Connection Faild")
         print(e)
         time.sleep(10)
-
-
-def find_blog_by_id(id: int):
-    for blog in my_blogs:
-        if blog["id"] == id:
-            return blog
-
-
-def find_blog_index_by_id(id: int):
-    for index, blog in enumerate(my_blogs):
-        if blog["id"] == id:
-            return index
 
 
 @router.get("/blogs")
