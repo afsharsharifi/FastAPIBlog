@@ -15,7 +15,8 @@ def read_root():
 
 @app.get("/sqlalchemy")
 def test_root(db: Session = Depends(database.get_db)):
-    return {"status": "OK"}
+    blogs = db.query(models.Blog).all()
+    return {"data": blogs}
 
 
 app.include_router(BlogRoutes.router, tags=["Blog"])

@@ -1,8 +1,10 @@
 import time
 
 import psycopg2
-from fastapi import APIRouter, HTTPException, Response, status
+from apps.core import database, models
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from psycopg2.extras import RealDictCursor
+from sqlalchemy.orm import Session
 
 from .models import Blog
 
@@ -21,17 +23,22 @@ while True:
 
 
 @router.get("/blogs")
-def get_blogs():
-    cursor.execute("SELECT * FROM blogs")
-    blogs = cursor.fetchall()
+def get_blogs(db: Session = Depends(database.get_db)):
+    # cursor.execute("SELECT * FROM blogs")
+    # blogs = cursor.fetchall()
+    blogs = db.query(models.Blog).all()
     return {"data": blogs}
 
 
 @router.post("/blogs", status_code=status.HTTP_201_CREATED)
-def create_blog(blog: Blog):
-    cursor.execute("INSERT INTO blogs (title, content, is_published) VALUES (%s, %s, %s) RETURNING *", (blog.title, blog.content, blog.is_published))
-    new_blog = cursor.fetchone()
-    conn.commit()
+def create_blog(blog: Blog, db: Session = Depends(database.get_db)):
+    # cursor.execute("INSERT INTO blogs (title, content, is_published) VALUES (%s, %s, %s) RETURNING *", (blog.title, blog.content, blog.is_published))
+    # new_blog = cursor.fetchone()
+    # conn.commit()
+    new_blog = models.Blog(title=blog.title, content=blog.content, is_published=blog.is_published)
+    db.add(new_blog)
+    db.commit()
+    db.refresh(new_blog)
     return {"data": new_blog}
 
 
