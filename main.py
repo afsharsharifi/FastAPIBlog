@@ -1,7 +1,6 @@
-from apps.blog import routers as BlogRoutes
-from fastapi import Depends, FastAPI
-from sqlalchemy.orm import Session
-from apps.core import models, database
+from core import database, models
+from fastapi import FastAPI
+from routers import posts as PostRoutes
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -13,10 +12,4 @@ def read_root():
     return {"message": "This is Root"}
 
 
-@app.get("/sqlalchemy")
-def test_root(db: Session = Depends(database.get_db)):
-    blogs = db.query(models.Blog).all()
-    return {"data": blogs}
-
-
-app.include_router(BlogRoutes.router, tags=["Blog"])
+app.include_router(PostRoutes.router, tags=["Posts"])
