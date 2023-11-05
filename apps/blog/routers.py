@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
 
-from .models import Blog
+from .schemas import Blog
 
 router = APIRouter()
 

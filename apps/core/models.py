@@ -1,7 +1,8 @@
-from .database import Base
-from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.sql.sqltypes import TIMESTAMP
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.sql.expression import text
+from sqlalchemy.sql.sqltypes import TIMESTAMP
+
+from .database import Base
 
 
 class Blog(Base):
