@@ -35,7 +35,7 @@ def create_blog(blog: Blog, db: Session = Depends(database.get_db)):
     # cursor.execute("INSERT INTO blogs (title, content, is_published) VALUES (%s, %s, %s) RETURNING *", (blog.title, blog.content, blog.is_published))
     # new_blog = cursor.fetchone()
     # conn.commit()
-    new_blog = models.Blog(title=blog.title, content=blog.content, is_published=blog.is_published)
+    new_blog = models.Blog(**blog.model_dump())
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
