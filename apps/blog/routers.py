@@ -43,29 +43,37 @@ def create_blog(blog: Blog, db: Session = Depends(database.get_db)):
 
 
 @router.get("/blogs/{id}")
-def get_blog(id: int):
-    cursor.execute("SELECT * FROM blogs WHERE id=%s", (str(id),))
-    blog = cursor.fetchone()
+def get_blog(id: int, db: Session = Depends(database.get_db)):
+    # cursor.execute("SELECT * FROM blogs WHERE id=%s", (str(id),))
+    # blog = cursor.fetchone()
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blog:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} does not exists.")
     return {"data": blog}
 
 
 @router.delete("/blogs/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_blog(id: int):
-    cursor.execute("DELETE FROM blogs WHERE id=%s RETURNING *", (str(id),))
-    deleted_blog = cursor.fetchone()
-    conn.commit()
-    if deleted_blog == None:
+def delete_blog(id: int, db: Session = Depends(database.get_db)):
+    # cursor.execute("DELETE FROM blogs WHERE id=%s RETURNING *", (str(id),))
+    # deleted_blog = cursor.fetchone()
+    # conn.commit()
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if blog.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} does not exists.")
+    blog.delete(synchronize_session=False)
+    db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/blogs/{id}")
-def update_post(id: int, blog: Blog):
-    cursor.execute("UPDATE blogs SET title=%s, content=%s, is_published=%s WHERE id=%s RETURNING *", (blog.title, blog.content, blog.is_published, str(id)))
-    updated_blog = cursor.fetchone()
-    conn.commit()
-    if updated_blog == None:
+def update_post(id: int, blog: Blog, db: Session = Depends(database.get_db)):
+    # cursor.execute("UPDATE blogs SET title=%s, content=%s, is_published=%s WHERE id=%s RETURNING *", (blog.title, blog.content, blog.is_published, str(id)))
+    # updated_blog = cursor.fetchone()
+    # conn.commit()
+    blog_query = db.query(models.Blog).filter(models.Blog.id == id)
+    blog_object = blog_query.first()
+    if blog_object == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} does not exists.")
-    return {"data": updated_blog}
+    blog_query.update(blog.model_dump(), synchronize_session=False)
+    db.commit()
+    return {"data": blog_query.first()}
