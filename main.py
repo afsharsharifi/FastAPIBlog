@@ -1,6 +1,7 @@
 from core import database, models
 from fastapi import FastAPI
 from routers import posts as PostRoutes
+from routers import users as UserRoutes
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -13,3 +14,4 @@ def read_root():
 
 
 app.include_router(PostRoutes.router, tags=["Posts"])
+app.include_router(UserRoutes.router, tags=["Users"])
