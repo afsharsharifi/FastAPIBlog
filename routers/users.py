@@ -9,10 +9,10 @@ from utils.utils import hash_password
 
 
 
-router = APIRouter()
+router = APIRouter(tags=["Users"], prefix="/users")
 
 
-@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=users.UserGet)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=users.UserGet)
 def create_user(user: users.UserCreate, db: Session = Depends(database.get_db)):
     hashed_password = hash_password(user.password)
     user.password = hashed_password
@@ -23,7 +23,7 @@ def create_user(user: users.UserCreate, db: Session = Depends(database.get_db)):
     return new_user
 
 
-@router.get("/users/{id}", response_model=users.UserGet)
+@router.get("/{id}", response_model=users.UserGet)
 def get_user(id: int, db: Session = Depends(database.get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
