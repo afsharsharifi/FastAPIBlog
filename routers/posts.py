@@ -19,7 +19,7 @@ def get_posts(db: Session = Depends(database.get_db)):
 def create_post(
     post: post.PostCreate,
     db: Session = Depends(database.get_db),
-    get_current_user: int = Depends(oauth2.get_current_user),
+    current_user: int = Depends(oauth2.get_current_user),
 ):
     new_post = models.Post(**post.model_dump())
     db.add(new_post)
@@ -37,7 +37,11 @@ def get_post(id: int, db: Session = Depends(database.get_db)):
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(database.get_db)):
+def delete_post(
+    id: int,
+    db: Session = Depends(database.get_db),
+    current_user: int = Depends(oauth2.get_current_user),
+):
     post = db.query(models.Post).filter(models.Post.id == id)
     if post.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} does not exists.")
@@ -47,7 +51,12 @@ def delete_post(id: int, db: Session = Depends(database.get_db)):
 
 
 @router.put("/{id}", response_model=post.Post)
-def update_post(id: int, post: post.PostCreate, db: Session = Depends(database.get_db)):
+def update_post(
+    id: int,
+    post: post.PostCreate,
+    db: Session = Depends(database.get_db),
+    current_user: int = Depends(oauth2.get_current_user),
+):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post_object = post_query.first()
     if post_object == None:
