@@ -14,5 +14,6 @@ class PostCreate(PostBase):
 
 
 class Post(PostBase):
+    owner_id: int
     id: int
     created_at: datetime
