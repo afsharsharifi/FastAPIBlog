@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from core import database, models
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -10,8 +10,13 @@ router = APIRouter(tags=["Posts"], prefix="/posts")
 
 
 @router.get("/", response_model=List[post.Post])
-def get_posts(db: Session = Depends(database.get_db)):
-    posts = db.query(models.Post).all()
+def get_posts(
+    db: Session = Depends(database.get_db),
+    limit: int = 10,
+    skip: int = 0,
+    search: Optional[str] = None,
+):
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
 
@@ -65,10 +70,10 @@ def update_post(
     post_object = post_query.first()
     if post_object == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} does not exists.")
-    
+
     if post_object.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorized to Perform Requested Action")
-    
+
     post_query.update(post.model_dump(), synchronize_session=False)
     db.commit()
     return post_query.first()
