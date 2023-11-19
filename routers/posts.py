@@ -19,7 +19,7 @@ def get_posts(db: Session = Depends(database.get_db)):
 def create_post(
     post: post.PostCreate,
     db: Session = Depends(database.get_db),
-    current_user: int = Depends(oauth2.get_current_user),
+    current_user: dict = Depends(oauth2.get_current_user),
 ):
     new_post = models.Post(owner_id=current_user.id, **post.model_dump())
     db.add(new_post)
@@ -40,7 +40,7 @@ def get_post(id: int, db: Session = Depends(database.get_db)):
 def delete_post(
     id: int,
     db: Session = Depends(database.get_db),
-    current_user: int = Depends(oauth2.get_current_user),
+    current_user: dict = Depends(oauth2.get_current_user),
 ):
     post = db.query(models.Post).filter(models.Post.id == id)
     if post.first() == None:
@@ -59,7 +59,7 @@ def update_post(
     id: int,
     post: post.PostCreate,
     db: Session = Depends(database.get_db),
-    current_user: int = Depends(oauth2.get_current_user),
+    current_user: dict = Depends(oauth2.get_current_user),
 ):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post_object = post_query.first()
