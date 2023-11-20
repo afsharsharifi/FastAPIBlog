@@ -1,9 +1,21 @@
-import os
+from pydantic_settings import BaseSettings
 
-from dotenv import load_dotenv
 
-load_dotenv()
+class Settings(BaseSettings):
+    # Database Config
+    database_username: str
+    database_password: str
+    database_hostname: str
+    database_port: str
+    database_name: str
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+    # JWT Confug
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes: int
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()

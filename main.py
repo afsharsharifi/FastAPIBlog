@@ -1,6 +1,7 @@
 from core import database, models
 from fastapi import FastAPI
 from routers import posts, users, auth
+from core.config import settings
 
 models.Base.metadata.create_all(bind=database.engine)
 
