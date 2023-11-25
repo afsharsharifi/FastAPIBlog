@@ -1,11 +1,16 @@
-from core import database, models
 from fastapi import FastAPI
 from routers import posts, users, auth, votes
-from core.config import settings
-
-# models.Base.metadata.create_all(bind=database.engine)
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/", tags=["Root"])
