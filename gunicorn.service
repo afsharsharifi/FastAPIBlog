@@ -1,0 +1,14 @@
+[Unit]
+Description=FastAPI Blog
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/FastAPIBlog/
+Environment="PATH=/root/FastAPIBlog/.venv/bin"
+EnvironmentFile=/root/FastAPIBlog/.env
+ExecStart=/root/FastAPIBlog/.venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
