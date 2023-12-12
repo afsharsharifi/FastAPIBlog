@@ -1,24 +1,24 @@
+import pytest
 from schemas import users
 
-from .database import client, session
 
-
-def test_root(client):
-    res = client.get("/")
-    assert res.json().get("message") == "This is Root"
-    assert res.status_code == 200
-
-
-def test_create_user(client):
+@pytest.mark.parametrize(
+    "first_name, last_name, email, password",
+    [
+        ("Ahmad", "Rezaei", "ahmadrezaei@gmail.com", "ahM@dr4i"),
+        ("Sara", "Mohammadi", "sarammmdi79@gmail.com", "saramohammadi"),
+    ],
+)
+def test_create_user(client, first_name, last_name, email, password):
     res = client.post(
-        "/users",
+        "/users/",
         json={
-            "first_name": "Afshar",
-            "last_name": "Sharifi",
-            "email": "afsharsharifi6@gmail.com",
-            "password": "12345678",
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "password": password,
         },
     )
     new_user = users.UserGet(**res.json())
-    assert new_user.email == "afsharsharifi6@gmail.com"
+    assert new_user.email == email
     assert res.status_code == 201
