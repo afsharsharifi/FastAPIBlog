@@ -1,5 +1,6 @@
-from schemas import post as post_schemas
 import pytest
+
+from schemas import post as post_schemas
 
 
 def test_get_all_posts(client, test_posts):
@@ -108,3 +109,50 @@ def test_delete_post_not_exist(authorized_client, test_posts, test_user):
 def test_delete_post_other_user(authorized_client, test_posts, test_user):
     res = authorized_client.delete(f"/posts/{test_posts[3].id}")
     assert res.status_code == 403
+
+
+def test_update_post_unauthorized(client, test_posts):
+    res = client.put(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 401
+
+
+def test_update_post_success(authorized_client, test_posts):
+    res = authorized_client.put(
+        f"/posts/{test_posts[0].id}",
+        json={"title": "Updated title", "content": "Updated Content"},
+    )
+    updated_post = post_schemas.Post(**res.json())
+    assert res.status_code == 200
+    assert updated_post.title == "Updated title"
+    assert updated_post.content == "Updated Content"
+
+
+def test_update_post_not_exist(authorized_client, test_posts):
+    res = authorized_client.put(
+        "/posts/0",
+        json={"title": "Updated title", "content": "Updated Content"},
+    )
+    assert res.status_code == 404
+
+
+def test_update_post_other_user(authorized_client, test_posts):
+    res = authorized_client.put(
+        f"/posts/{test_posts[3].id}",
+        json={"title": "Updated title", "content": "Updated Content"},
+    )
+    assert res.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "title, content",
+    [
+        (None, "<h1>Updated Content</h1>"),
+        ("Updated title", None),
+    ],
+)
+def test_update_post_invalid(authorized_client, test_posts, title, content):
+    res = authorized_client.put(
+        f"/posts/{test_posts[0].id}",
+        json={"title": title, "content": content},
+    )
+    assert res.status_code == 422
