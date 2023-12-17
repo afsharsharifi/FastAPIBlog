@@ -88,3 +88,23 @@ def test_create_post_invalid(authorized_client, test_posts, title, content):
         json={"title": title, "content": content},
     )
     assert res.status_code == 422
+
+
+def test_delete_post_unauthorized(client, test_posts):
+    res = client.delete(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 401
+
+
+def test_delete_post_success(authorized_client, test_posts, test_user):
+    res = authorized_client.delete(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 204
+
+
+def test_delete_post_not_exist(authorized_client, test_posts, test_user):
+    res = authorized_client.delete("/posts/0")
+    assert res.status_code == 404
+
+
+def test_delete_post_other_user(authorized_client, test_posts, test_user):
+    res = authorized_client.delete(f"/posts/{test_posts[3].id}")
+    assert res.status_code == 403

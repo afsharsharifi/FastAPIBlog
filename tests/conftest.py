@@ -57,6 +57,23 @@ def test_user(client):
 
 
 @pytest.fixture
+def test_user2(client):
+    res = client.post(
+        "/users/",
+        json={
+            "first_name": "Ali",
+            "last_name": "Rezaie",
+            "email": "alirz1380@gmail.com",
+            "password": "12345678",
+        },
+    )
+    assert res.status_code == 201
+    new_user = res.json()
+    new_user["password"] = "12345678"
+    return new_user
+
+
+@pytest.fixture
 def token(test_user):
     return oauth2.create_access_token({"user_id": test_user["id"]})
 
@@ -68,12 +85,14 @@ def authorized_client(client, token):
 
 
 @pytest.fixture
-def test_posts(test_user, session):
+def test_posts(test_user, test_user2, session):
     session.add_all(
         [
-            models.Post(owner_id=test_user["id"], title="first title", content="<h1>This is 1 Content"),
-            models.Post(owner_id=test_user["id"], title="second title", content="<h1>This is 2 Content"),
-            models.Post(owner_id=test_user["id"], title="third title", content="<h1>This is 3 Content"),
+            models.Post(owner_id=test_user["id"], title="first title", content="<h1>This is 1 Content</h1>"),
+            models.Post(owner_id=test_user["id"], title="second title", content="<h1>This is 2 Content</h1>"),
+            models.Post(owner_id=test_user["id"], title="third title", content="<h1>This is 3 Content</h1>"),
+            models.Post(owner_id=test_user2["id"], title="other user", content="<h1>This is Ali's Post</h1>"),
+            models.Post(owner_id=test_user2["id"], title="other user post 2", content="<h1>This is Ali's second Post</h1>"),
         ]
     )
     session.commit()
