@@ -1,10 +1,13 @@
 import pytest
-from core.config import settings
-from core.database import Base, get_db
 from fastapi.testclient import TestClient
-from main import app
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from core import models
+from core.config import settings
+from core.database import Base, get_db
+from main import app
+from utils import oauth2
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test"
 
@@ -51,3 +54,28 @@ def test_user(client):
     new_user = res.json()
     new_user["password"] = "12345678"
     return new_user
+
+
+@pytest.fixture
+def token(test_user):
+    return oauth2.create_access_token({"user_id": test_user["id"]})
+
+
+@pytest.fixture
+def authorized_client(client, token):
+    client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
+    return client
+
+
+@pytest.fixture
+def test_posts(test_user, session):
+    session.add_all(
+        [
+            models.Post(owner_id=test_user["id"], title="first title", content="<h1>This is 1 Content"),
+            models.Post(owner_id=test_user["id"], title="second title", content="<h1>This is 2 Content"),
+            models.Post(owner_id=test_user["id"], title="third title", content="<h1>This is 3 Content"),
+        ]
+    )
+    session.commit()
+    posts = session.query(models.Post).all()
+    return posts
