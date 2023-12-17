@@ -29,7 +29,7 @@ def test_login_user(client, test_user):
         ("wrongemail@gmail.com", None, 422),
     ],
 )
-def test_invalid_login(client, test_user, email, password, status_code):
+def test_invalid_login(client, email, password, status_code):
     res = client.post(
         "/auth/login",
         data={
