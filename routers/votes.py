@@ -25,7 +25,7 @@ def like_post(
     new_vote = models.Vote(post_id=vote.post_id, user_id=current_user.id)
     db.add(new_vote)
     db.commit()
-    return {"message": f"Successfully Liked Post with ID of {vote.post_id}"}
+    return {"detail": f"Successfully Liked Post with ID of {vote.post_id}"}
 
 
 @router.post("/dislike", status_code=status.HTTP_204_NO_CONTENT)
@@ -45,4 +45,4 @@ def dislike_post(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User hasn't liked this post yet")
     vote_query.delete(synchronize_session=False)
     db.commit()
-    return {"message": f"Successfully Removed Like from Post with ID of {vote.post_id}"}
+    return {"detail": f"Successfully Removed Like from Post with ID of {vote.post_id}"}
