@@ -37,6 +37,11 @@ def test_like_post_not_exists(authorized_client):
     assert res.json()["detail"] == f"Post with id 0 does not exists."
 
 
+def test_like_post_unauthorized(client, test_posts):
+    res = client.post("vote/like", json={"post_id": test_posts[3].id})
+    assert res.status_code == 401
+
+
 def test_dislike_post_success(authorized_client, test_posts, test_vote):
     post_id = test_posts[3].id
     res = authorized_client.post("vote/dislike", json={"post_id": post_id})
@@ -61,3 +66,8 @@ def test_dislike_post_not_exists(authorized_client, test_posts):
     res = authorized_client.post("vote/dislike", json={"post_id": 0})
     assert res.status_code == 404
     assert res.json()["detail"] == "Post with id 0 does not exists."
+
+
+def test_dislike_post_unauthorized(client, test_posts):
+    res = client.post("vote/dislike", json={"post_id": test_posts[3].id})
+    assert res.status_code == 401
