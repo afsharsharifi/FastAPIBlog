@@ -16,6 +16,8 @@ def like_post(
     post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {vote.post_id} does not exists.")
+    if post.owner_id == current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cant Like Own Post")
     vote_query = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user.id)
     has_vote = vote_query.first()
     if has_vote:
@@ -35,6 +37,8 @@ def dislike_post(
     post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {vote.post_id} does not exists.")
+    if post.owner_id == current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cant Dislike Own Post")
     vote_query = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user.id)
     has_vote = vote_query.first()
     if not has_vote:
