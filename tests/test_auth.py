@@ -1,6 +1,7 @@
 import pytest
-from core.config import settings
 from jose import jwt
+
+from core.config import settings
 from schemas import auth
 
 
