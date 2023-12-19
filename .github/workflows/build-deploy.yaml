@@ -41,5 +41,6 @@ jobs:
       - name: test with pytest
         run: |
           pip install httpx
+          pip install pydantic[email]
           pip install pytest
           pytest
