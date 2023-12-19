@@ -3,7 +3,7 @@ name: Build and Deploy Code
 on: [push, pull_request]
 
 jobs:
-  job1:
+  build:
     env:
       DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
       DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
@@ -44,3 +44,16 @@ jobs:
           pip install pydantic[email]
           pip install pytest
           pytest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: deploying to ubuntu server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{secrets.USERNAME}}
+          password: ${{secrets.PASSWORD}}
+          script: |
+            cd FastAPIBlog/
+            git pull
