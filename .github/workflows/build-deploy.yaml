@@ -57,3 +57,4 @@ jobs:
           script: |
             cd FastAPIBlog/
             git pull
+            sudo systemctl restart fastapiblog

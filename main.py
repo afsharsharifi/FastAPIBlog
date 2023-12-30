@@ -16,7 +16,7 @@ app.add_middleware(
 
 @app.get("/", tags=["Root"])
 def read_root():
-    return {"message": "This is Root"}
+    return {"message": "You did it Hi From CI/CD"}
 
 
 app.include_router(auth.router)
